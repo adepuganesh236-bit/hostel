@@ -58,7 +58,6 @@ export default function StudentPayments() {
                   <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
                     <th className="px-5 py-3">Payment ID</th>
                     <th className="px-5 py-3">Type</th>
-                    <th className="px-5 py-3">Method</th>
                     <th className="px-5 py-3">Transaction ID</th>
                     <th className="px-5 py-3">Date</th>
                     <th className="px-5 py-3">Amount</th>
@@ -70,7 +69,6 @@ export default function StudentPayments() {
                     <tr key={p.paymentId || p.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                       <td className="px-5 py-3.5 font-mono text-xs font-bold text-slate-700">{p.paymentId || p.id}</td>
                       <td className="px-5 py-3.5 text-slate-600">{p.type || 'Monthly Rent'}</td>
-                      <td className="px-5 py-3.5 text-slate-600">{p.method || 'UPI'}</td>
                       <td className="px-5 py-3.5 font-mono text-xs text-slate-500">{p.transactionId}</td>
                       <td className="px-5 py-3.5 text-slate-500">{formatDate(p.date)}</td>
                       <td className="px-5 py-3.5 font-bold text-slate-800">{inr(p.amount)}</td>

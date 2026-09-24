@@ -13,6 +13,8 @@ const STATUS_COLORS = {
   in_progress: 'bg-sky-50 text-sky-700 ring-sky-600/20',
   resolved: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
   rejected: 'bg-rose-50 text-rose-700 ring-rose-600/20',
+  active: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+  checked_out: 'bg-slate-100 text-slate-600 ring-slate-500/20',
 }
 
 export default function Badge({ status, label, className }) {

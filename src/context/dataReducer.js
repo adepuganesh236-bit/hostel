@@ -147,16 +147,6 @@ export function uiActions(state, action) {
       return { ...state, data: { ...data, payments, students, bookings } }
     }
 
-    case 'ADD_REVIEW': {
-      const reviews = [...data.reviews, action.review]
-      return { ...state, data: { ...data, reviews } }
-    }
-
-    case 'REMOVE_REVIEW': {
-      const reviews = data.reviews.filter((r) => r.id !== action.id)
-      return { ...state, data: { ...data, reviews } }
-    }
-
     case 'ADD_COMPLAINT': {
       const complaints = [...data.complaints, action.complaint]
       return { ...state, data: { ...data, complaints } }

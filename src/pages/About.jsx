@@ -23,8 +23,8 @@ const VALUES = [
 ]
 
 const MILESTONES = [
-  { value: '40+', label: 'Comfortable Rooms' },
-  { value: '100', label: 'Total Beds' },
+  { value: '20+', label: 'Comfortable Rooms' },
+  { value: '150', label: 'Total Beds' },
   { value: '3+', label: 'Years of Service' },
   { value: '4.8★', label: 'Average Rating' },
 ]
@@ -137,7 +137,7 @@ export default function About() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Why choose us"
-            title="The StayNest Promise"
+            title={`The ${HOSTEL.name} Promise`}
             subtitle="A student-friendly environment built on safety, cleanliness and care."
           />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -192,8 +192,8 @@ export default function About() {
               ))}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/gallery" className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700">
-                See the Photos <ArrowRight className="h-4 w-4" />
+              <Link to="/facilities" className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700">
+                Explore Our Facilities <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -219,14 +219,14 @@ export default function About() {
         <div className="rounded-3xl border border-slate-200 bg-white px-8 py-12 text-center shadow-card">
           <Award className="mx-auto h-10 w-10 text-brand-600" />
           <h2 className="mt-4 font-display text-2xl font-bold text-slate-900 sm:text-3xl">
-            Experience the StayNest Difference
+            Experience the {HOSTEL.name} Difference
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-slate-500">
             Visit us any day between 10 AM and 7 PM, or book a bed online in just a few minutes.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/rooms" className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-700">
-              <BedDouble className="h-4 w-4" /> Explore Rooms
+            <Link to="/facilities" className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-700">
+              <BedDouble className="h-4 w-4" /> Explore Facilities
             </Link>
             <Link to="/contact" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-7 py-3 text-sm font-bold text-slate-700 transition hover:border-brand-300 hover:text-brand-700">
               <Users className="h-4 w-4" /> Contact Us

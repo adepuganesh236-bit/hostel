@@ -37,11 +37,9 @@ export default function PaymentSuccess() {
   }
 
   const dashPath =
-    role === 'owner'
+    role === 'owner' || role === 'admin'
       ? '/owner/dashboard'
-      : role === 'admin'
-        ? '/admin/dashboard'
-        : '/student/dashboard'
+      : '/student/dashboard'
 
   return (
     <div className="min-h-screen bg-emerald-50/60 py-14">
@@ -52,7 +50,7 @@ export default function PaymentSuccess() {
             <CheckCircle2 className="h-10 w-10" />
           </span>
           <h1 className="mt-5 font-display text-3xl font-extrabold text-slate-900">Payment Successful</h1>
-          <p className="mt-1.5 text-slate-500">Your booking has been confirmed with StayNest Premium Hostel.</p>
+          <p className="mt-1.5 text-slate-500">Your booking has been confirmed with Hostel.</p>
         </div>
 
         {/* Receipt */}
@@ -61,7 +59,7 @@ export default function PaymentSuccess() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-display text-lg font-bold">Payment Receipt</p>
-                <p className="text-xs text-brand-200">StayNest Premium Hostel · {formatDate(new Date())}</p>
+                <p className="text-xs text-brand-200">Hostel · {formatDate(new Date())}</p>
               </div>
               <Badge status="paid" label="Paid" className="bg-emerald-500/20 text-emerald-200 ring-emerald-300/30" />
             </div>

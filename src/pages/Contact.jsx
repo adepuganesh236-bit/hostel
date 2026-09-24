@@ -93,7 +93,7 @@ export default function Contact() {
             {/* Map */}
             <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-card">
               <iframe
-                title="StayNest Hostel Location"
+                title={`${HOSTEL.name} Hostel Location`}
                 src={HOSTEL.mapsEmbed}
                 className="h-64 w-full"
                 loading="lazy"

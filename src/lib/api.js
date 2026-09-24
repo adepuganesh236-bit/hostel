@@ -42,9 +42,6 @@ export const api = {
 
   createPayment: (payment) => request('/api/payments', { method: 'POST', body: payment }),
 
-  createReview: (review) => request('/api/reviews', { method: 'POST', body: review }),
-  deleteReview: (id) => request(`/api/reviews/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-
   createComplaint: (complaint) => request('/api/complaints', { method: 'POST', body: complaint }),
   updateComplaintStatus: (id, status) =>
     request(`/api/complaints/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { status } }),
@@ -55,6 +52,8 @@ export const api = {
 
   updateBed: (bed) => request(`/api/beds/${encodeURIComponent(bed.id)}`, { method: 'PATCH', body: bed }),
   updateStudent: (student) => request(`/api/students/${encodeURIComponent(student.id)}`, { method: 'PATCH', body: student }),
+  checkoutStudent: (id, date) =>
+    request(`/api/students/${encodeURIComponent(id)}/checkout`, { method: 'POST', body: { date } }),
 
   createContact: (contact) => request('/api/contacts', { method: 'POST', body: contact }),
 
@@ -62,4 +61,8 @@ export const api = {
   login: (credentials) => request('/api/auth/login', { method: 'POST', body: credentials }),
   me: () => request('/api/auth/me'),
   logout: () => request('/api/auth/logout', { method: 'POST' }),
+
+  getCaptcha: () => request('/api/auth/captcha', { method: 'POST' }),
+  forgotPassword: (payload) => request('/api/auth/forgot-password', { method: 'POST', body: payload }),
+  resetPassword: (payload) => request('/api/auth/reset-password', { method: 'POST', body: payload }),
 }

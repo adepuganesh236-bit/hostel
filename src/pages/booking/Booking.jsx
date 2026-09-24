@@ -135,8 +135,8 @@ export default function Booking() {
       {/* Header */}
       <section className="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-950 py-12 text-white">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <Link to="/rooms" className="text-sm font-semibold text-brand-200 hover:text-white">
-            ← Back to Rooms
+          <Link to="/facilities" className="text-sm font-semibold text-brand-200 hover:text-white">
+            ← Back to Facilities
           </Link>
           <h1 className="mt-2 font-display text-2xl font-bold sm:text-3xl">Complete Your Booking</h1>
           <p className="mt-1.5 text-sm text-slate-300">
@@ -200,7 +200,7 @@ export default function Booking() {
                             </p>
                             <Badge status={avail > 0 ? 'available' : 'occupied'} label={avail > 0 ? `${avail} free` : 'Full'} />
                           </div>
-                          <p className="mt-1 text-sm text-slate-500">{room.typeLabel} · {room.ac ? 'AC' : 'Non-AC'}</p>
+                          <p className="mt-1 text-sm text-slate-500">{room.typeLabel}</p>
                           <p className="mt-1 font-display text-base font-bold text-brand-700">{inr(room.rent)}<span className="text-xs font-semibold text-slate-400">/mo</span></p>
                         </button>
                       )
@@ -217,7 +217,7 @@ export default function Booking() {
                     <BedDouble className="h-5 w-5 text-brand-600" /> Step 2 · Select a Bed — Room {selectedRoom.roomNumber}
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    {selectedRoom.typeLabel} · {selectedRoom.ac ? 'AC' : 'Non-AC'} · {inr(selectedRoom.rent)}/month
+                    {selectedRoom.typeLabel} · {inr(selectedRoom.rent)}/month
                   </p>
                   <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {selectedRoom.beds.map((bed) => {
@@ -303,8 +303,8 @@ export default function Booking() {
                     <CreditCard className="h-5 w-5 text-brand-600" /> Step 4 · Review Your Booking
                   </h2>
                   <dl className="mt-5 space-y-3 text-sm">
-                    <Row label="Hostel" value="StayNest Premium Hostel" />
-                    <Row label="Room" value={`Room ${selectedRoom.roomNumber} (${selectedRoom.typeLabel}, ${selectedRoom.ac ? 'AC' : 'Non-AC'})`} />
+                    <Row label="Hostel" value="Hostel" />
+                    <Row label="Room" value={`Room ${selectedRoom.roomNumber} (${selectedRoom.typeLabel})`} />
                     <Row label="Bed" value={selectedBed.bedNumber} />
                     <Row label="Student" value={form.fullName} />
                     <Row label="Joining" value={form.joiningDate} />
@@ -332,7 +332,7 @@ export default function Booking() {
                 <CardBody>
                   <p className="font-display text-sm font-bold uppercase tracking-wide text-slate-400">Booking Summary</p>
                   <div className="mt-4 space-y-2.5 text-sm">
-                    <MiniRow label="Hostel" value="StayNest Premium Hostel" />
+                    <MiniRow label="Hostel" value="Hostel" />
                     <MiniRow label="Room" value={selectedRoom ? `Room ${selectedRoom.roomNumber}` : '—'} />
                     <MiniRow label="Bed" value={selectedBed?.bedNumber || '—'} />
                   </div>

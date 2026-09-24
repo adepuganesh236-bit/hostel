@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { KeyRound, Smartphone, UserCog, Sparkles } from 'lucide-react'
+import { KeyRound, Smartphone, UserCog } from 'lucide-react'
 import AuthShell from '../../components/layout/AuthShell'
 import Button from '../../components/ui/Button'
 import { Field, Input } from '../../components/ui/Field'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import { HOSTEL } from '../../config'
 import { cx } from '../../lib/utils'
 
 export default function OwnerLogin() {
@@ -19,13 +18,6 @@ export default function OwnerLogin() {
   const [otpSent, setOtpSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const demoOwnerMobile = HOSTEL.ownerMobile
-
-  const fillDemo = () => {
-    setMobile(demoOwnerMobile)
-    toast.info(`Demo owner's number auto-filled: ${demoOwnerMobile}`)
-  }
 
   const handleSend = async (e) => {
     e.preventDefault()
@@ -88,8 +80,8 @@ export default function OwnerLogin() {
       subtitle="Secure access for the hostel management team."
       demoHint={
         isSupabaseConfigured
-          ? `Authenticate with the owner's mobile (${demoOwnerMobile}) using a real SMS OTP via Supabase. No password is ever stored.`
-          : 'Demo Mode: the demo owner mobile is used only as the configured identifier to sign in as the owner. No password or OTP is faked or hard-coded.'
+          ? 'Authenticate with a real SMS OTP via Supabase. No password is ever stored.'
+          : 'Demo Mode: the demo owner mobile is used to sign in. No password or OTP is faked or hard-coded.'
       }
       footer={
         <>
@@ -111,17 +103,6 @@ export default function OwnerLogin() {
         <p className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{error}</p>
       ) : null}
 
-      {!isSupabaseConfigured && !mobile ? (
-        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
-          <p className="text-sm font-semibold text-amber-800">Demo owner mobile</p>
-          <p className="mt-1 font-display text-lg font-bold tracking-wide text-amber-900">{demoOwnerMobile}</p>
-          <p className="mt-1 text-xs text-amber-700">Enter this number below to sign in as the owner.</p>
-          <Button type="button" variant="outline" size="sm" className="mt-3" onClick={fillDemo}>
-            <Sparkles className="h-4 w-4 text-amber-500" /> Auto-fill demo owner number
-          </Button>
-        </div>
-      ) : null}
-
       {!otpSent ? (
         <form onSubmit={handleSend} className="space-y-4">
           <div className="flex items-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-800">
@@ -140,6 +121,12 @@ export default function OwnerLogin() {
           <Button type="submit" loading={loading} size="lg" className="w-full">
             <KeyRound className="h-4 w-4" /> {isSupabaseConfigured ? 'Send OTP' : 'Authenticate & Login'}
           </Button>
+          <Link
+            to="/forgot-password"
+            className="block text-center text-sm font-semibold text-brand-700 hover:text-brand-800"
+          >
+            Forgot password?
+          </Link>
         </form>
       ) : (
         <form onSubmit={handleVerify} className="space-y-4">

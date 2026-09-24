@@ -26,7 +26,9 @@ export function RequireRole({ role: required, children }) {
     const map = {
       student: '/student/dashboard',
       owner: '/owner/dashboard',
-      admin: '/admin/dashboard',
+      // The owner panel is the primary management role; any legacy admin
+      // account is redirected there instead of a (removed) admin panel.
+      admin: '/owner/dashboard',
     }
     return <Navigate to={map[role]} replace />
   }

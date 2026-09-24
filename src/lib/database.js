@@ -21,7 +21,6 @@ export const TABLES = [
   'bookings',
   'payments',
   'food_menu',
-  'reviews',
   'complaints',
   'contacts',
 ]
@@ -36,9 +35,9 @@ function mapRoom(row) {
     floor: row.floor,
     sharing: row.sharing,
     typeLabel: row.type_label,
-    ac: Boolean(row.ac),
     rent: row.rent,
     advance: row.advance,
+    image: row.image || '',
     beds: [],
     createdAt: row.created_at,
   }
@@ -66,11 +65,16 @@ function mapStudent(row, booking) {
     course: row.course,
     gender: row.gender,
     yearOfStudy: row.year,
+    motherName: row.mother_name,
+    fatherName: row.father_name,
+    parentPhone: row.parent_phone,
     roomNumber: booking?.room_number || row.room_number,
     bed: booking?.bed_number || row.bed_number,
     bedId: booking?.bed_id,
     joiningDate: booking?.date || row.joining_date,
     paymentStatus: row.payment_status || booking?.payment_status || 'pending',
+    preferredRoom: row.preferred_room,
+    checkoutDate: row.checkout_date,
   }
 }
 
@@ -114,7 +118,7 @@ export async function fetchAllData() {
 
   if (!isSupabaseConfigured || !supabase) return null
 
-  const [hostelRes, roomsRes, bedsRes, profilesRes, bookingsRes, paymentsRes, reviewsRes, complaintsRes] =
+  const [hostelRes, roomsRes, bedsRes, profilesRes, bookingsRes, paymentsRes, complaintsRes] =
     await Promise.all([
       supabase.from('hostel').select('*').limit(1).maybeSingle(),
       supabase.from('rooms').select('*'),
@@ -122,12 +126,11 @@ export async function fetchAllData() {
       supabase.from('profiles').select('*').eq('role', 'student'),
       supabase.from('bookings').select('*'),
       supabase.from('payments').select('*'),
-      supabase.from('reviews').select('*'),
       supabase.from('complaints').select('*'),
     ])
 
   // If tables don't exist yet, surface a helpful message
-  const anyError = [hostelRes, roomsRes, bedsRes, profilesRes, bookingsRes, paymentsRes, reviewsRes, complaintsRes]
+  const anyError = [hostelRes, roomsRes, bedsRes, profilesRes, bookingsRes, paymentsRes, complaintsRes]
     .map((r) => r?.error)
     .filter(Boolean)
   if (anyError.length) {
@@ -149,7 +152,6 @@ export async function fetchAllData() {
   )
 
   const payments = (paymentsRes.data || []).map((p) => ({ ...p, paymentId: p.payment_id }))
-  const reviews = (reviewsRes.data || []).map((r) => ({ ...r, verified: true }))
   const complaints = complaintsRes.data || []
 
   let hostel = hostelRes.data
@@ -163,7 +165,6 @@ export async function fetchAllData() {
     students: profiles,
     bookings,
     payments,
-    reviews,
     complaints,
     pricing: PRICING,
   }
@@ -174,7 +175,7 @@ export async function fetchAllData() {
 // -----------------------------------------------------------------------------
 export async function persistRoom(room) {
   if (isApiConfigured) {
-    return api.addRoom({ roomNumber: room.roomNumber, floor: room.floor, sharing: room.sharing, typeLabel: room.typeLabel, ac: room.ac, rent: room.rent, advance: room.advance })
+    return api.addRoom({ roomNumber: room.roomNumber, floor: room.floor, sharing: room.sharing, typeLabel: room.typeLabel, rent: room.rent, advance: room.advance, image: room.image })
   }
   const { error } = await supabase.from('rooms').upsert({
     id: room.id,
@@ -182,9 +183,9 @@ export async function persistRoom(room) {
     floor: room.floor,
     sharing: room.sharing,
     type_label: room.typeLabel,
-    ac: room.ac,
     rent: room.rent,
     advance: room.advance,
+    image: room.image,
   })
   if (error) throw error
 }
@@ -218,18 +219,26 @@ export async function persistPayment(payment) {
   if (error) throw error
 }
 
-export async function persistReview(review) {
-  if (isApiConfigured) {
-    return api.createReview(review)
-  }
-  const { error } = await supabase.from('reviews').upsert(review)
-  if (error) throw error
-}
-
 export async function persistComplaint(complaint) {
   if (isApiConfigured) {
     return api.createComplaint(complaint)
   }
   const { error } = await supabase.from('complaints').upsert(complaint)
+  if (error) throw error
+}
+
+export async function persistCheckout(id, date) {
+  if (isApiConfigured) {
+    return api.checkoutStudent(id, date)
+  }
+  const { error: bedError } = await supabase
+    .from('beds')
+    .update({ status: 'available', student_id: null })
+    .eq('student_id', id)
+  if (bedError) throw bedError
+  const { error } = await supabase
+    .from('profiles')
+    .update({ checkout_date: date, bed_id: null })
+    .eq('id', id)
   if (error) throw error
 }

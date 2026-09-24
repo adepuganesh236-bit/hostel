@@ -5,8 +5,8 @@
 // -----------------------------------------------------------------------------
 
 export const HOSTEL = {
-  name: 'StayNest Premium Hostel',
-  shortName: 'StayNest',
+  name: 'Sai Krishna',
+  shortName: 'Sai Krishna',
   tagline: 'Your Safe & Comfortable Home Away From Home',
 
   phone: '+91 98765 43210',
@@ -26,14 +26,19 @@ export const HOSTEL = {
   // demo owner during sign-in - NO password / OTP is ever hard-coded).
   ownerMobile: '6303693659',
 
-  // Optional: administrator demo email identifier shown on admin login.
-  adminEmail: 'admin@staynest.in',
-
   // Currency symbol used for formatting
   currency: '₹',
 
   // Optional WhatsApp number; when set, "Book Now" can be linked to WhatsApp
   whatsappBooking: '',
+
+  // Social media links (replace with the hostel's real profiles)
+  social: {
+    instagram: 'https://www.instagram.com/',
+    facebook: 'https://www.facebook.com/',
+    youtube: 'https://www.youtube.com/',
+    whatsapp: 'https://wa.me/91876543210',
+  },
 }
 
 export const PRICING = {
@@ -44,12 +49,10 @@ export const PRICING = {
 
   // Room base rents (per month) and advance (one time)
   rooms: {
-    single: { rent: 12000, acRent: 15000, advance: 12000 },
-    double: { rent: 8000, acRent: 10000, advance: 8000 },
-    triple: { rent: 6000, acRent: 7500, advance: 6000 },
-    quad: { rent: 5000, acRent: 6000, advance: 5000 },
+    six: { rent: 6000, advance: 6000 },
+    ten: { rent: 5000, advance: 5000 },
   },
 }
 
 // The 18 currently available beds shown on the home page hero
-export const AVAILABLE_BEDS = 18
+export const AVAILABLE_BEDS = 150 // beds currently available (home page hero)

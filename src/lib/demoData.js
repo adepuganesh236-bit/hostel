@@ -43,16 +43,18 @@ const COURSES = [
   'B.Com', 'M.Sc Physics', 'BCA', 'MCA', 'B.A English',
 ]
 
-// Room catalogue
-const SHARING_TYPES = [
-  { sharing: 4, prefix: 1 },
-  { sharing: 3, prefix: 2 },
-  { sharing: 2, prefix: 3 },
-  { sharing: 1, prefix: 4 },
+// Room catalogue: 4 floors × 5 rooms each
+// 1st floor → 101–105 (6 Sharing), 2nd floor → 201–205 (6 Sharing),
+// 3rd floor → 301–305 (10 Sharing), 4th floor → 401–405 (10 Sharing)
+const FLOORS = [
+  { number: 1, sharing: 6 },
+  { number: 2, sharing: 6 },
+  { number: 3, sharing: 10 },
+  { number: 4, sharing: 10 },
 ]
 
-const TYPE_LABEL = { 1: 'Single Sharing', 2: '2 Sharing', 3: '3 Sharing', 4: '4 Sharing' }
-const TYPE_KEY = { 1: 'single', 2: 'double', 3: 'triple', 4: 'quad' }
+const TYPE_LABEL = { 6: '6 Sharing', 10: '10 Sharing' }
+const TYPE_KEY = { 6: 'six', 10: 'ten' }
 
 // -----------------------------------------------------------------------------
 // Core demo dataset builder
@@ -62,20 +64,17 @@ export function buildDemoData() {
   const rooms = []
   const students = []
 
-  // 1) Create 40 rooms with their beds
-  SHARING_TYPES.forEach((group) => {
-    for (let i = 1; i <= 10; i++) createRoom(group, i)
+  // 1) Create 20 rooms: 4 floors × 5 rooms (101–105, 201–205, 301–305, 401–405)
+  FLOORS.forEach((floorInfo) => {
+    for (let i = 1; i <= 5; i++) createRoom(floorInfo, i)
   })
 
-  function createRoom(group, index) {
-    const { sharing, prefix } = group
-    const floor = prefix
-    const roomNumber = `${prefix}${String(index).padStart(2, '0')}`
+  function createRoom(floorInfo, index) {
+    const { number: floor, sharing } = floorInfo
+    const roomNumber = `${floor}${String(index).padStart(2, '0')}`
     const key = TYPE_KEY[sharing]
     const v = PRICING.rooms[key]
-    // Some rooms on each floor are AC
-    const ac = rng() > 0.55
-    const rent = ac ? v.acRent : v.rent
+    const rent = v.rent
     const beds = Array.from({ length: sharing }, (_, i) => {
       const status = 'available'
       return {
@@ -92,9 +91,9 @@ export function buildDemoData() {
       floor,
       sharing,
       typeLabel: TYPE_LABEL[sharing],
-      ac,
       rent,
       advance: v.advance,
+      image: '',
       beds,
       createdAt: randomDate(rng, '2024-06', '2026-01'),
     }
@@ -102,49 +101,6 @@ export function buildDemoData() {
     return room
   }
 
-  // 2) Occupy exactly 82 beds (matches the 82/18 split shown on the dashboard)
-  const allBeds = []
-  rooms.forEach((room) =>
-    room.beds.forEach((bed) => allBeds.push({ room, bed })),
-  )
-  // shuffle beds to distribute occupancy across all room types
-  for (let i = allBeds.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[allBeds[i], allBeds[j]] = [allBeds[j], allBeds[i]]
-  }
-
-  const OCCUPIED = 82
-  let studentCounter = 0
-
-  for (let i = 0; i < allBeds.length; i++) {
-    const { room, bed } = allBeds[i]
-    if (i < OCCUPIED) {
-      bed.status = 'occupied'
-      const name = NAME_POOL[studentCounter % NAME_POOL.length]
-      const college = COLLEGES[Math.floor(rng() * COLLEGES.length)]
-      const course = COURSES[Math.floor(rng() * COURSES.length)]
-      const student = {
-        id: `STU-${String(1000 + studentCounter)}`,
-        name,
-        firstName: name.split(' ')[0],
-        mobile: `9${Math.floor(6000000000 + rng() * 3999999999)}`,
-        email: slug(name) + '@student.demo',
-        college,
-        course,
-        gender: rng() > 0.45 ? 'Male' : 'Female',
-        roomNumber: room.roomNumber,
-        bed: bed.bedNumber,
-        bedId: bed.id,
-        joiningDate: randomDate(rng, '2025-01', '2026-08'),
-        paymentStatus: rng() > 0.35 ? 'paid' : 'pending',
-        yearOfStudy: 1 + Math.floor(rng() * 4),
-        avatar: initials(name),
-      }
-      bed.studentId = student.id
-      studentCounter++
-      students.push(student)
-    }
-  }
   // ensure deterministic room ordering
   rooms.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber))
 
@@ -162,59 +118,7 @@ export function buildDemoData() {
     .map((student, idx) => createPayment(student, rooms, idx))
     .filter(Boolean)
 
-  // 5) Reviews (only from students with confirmed bookings - stored boolean)
-  const reviews = [
-    {
-      id: 1, name: 'Rahul Sharma', firstName: 'Rahul', college: 'IIT Madras',
-      rating: 5, date: '2026-07-18',
-      text: 'Very clean rooms and good facilities. The food is amazing and the warden is super friendly. Truly feels like home.',
-      verified: true,
-    },
-    {
-      id: 2, name: 'Sneha Reddy', firstName: 'Sneha', college: 'Anna University',
-      rating: 5, date: '2026-07-05',
-      text: 'Safe and secure environment with 24/7 CCTV. My parents are very happy with the stay.',
-      verified: true,
-    },
-    {
-      id: 3, name: 'Arjun Nair', firstName: 'Arjun', college: 'VIT Chennai',
-      rating: 4, date: '2026-06-28',
-      text: 'Great study area and high speed Wi-Fi. Room service and cleaning is regular. Highly recommended.',
-      verified: true,
-    },
-    {
-      id: 4, name: 'Ananya Gupta', firstName: 'Ananya', college: 'Loyola College',
-      rating: 5, date: '2026-06-15',
-      text: 'Best decision I made for my hostel. Warm food, hot water, power backup - everything is well maintained.',
-      verified: true,
-    },
-    {
-      id: 5, name: 'Vikram Singh', firstName: 'Vikram', college: 'SRM Institute of Science & Technology',
-      rating: 4, date: '2026-06-02',
-      text: 'Comfortable beds and spacious rooms. Laundry and housekeeping are super convenient.',
-      verified: true,
-    },
-    {
-      id: 6, name: 'Kavya Iyer', firstName: 'Kavya', college: 'Madras Christian College',
-      rating: 5, date: '2026-05-20',
-      text: 'The common area is perfect for hanging out and the parking is very safe. Value for money stay.',
-      verified: true,
-    },
-    {
-      id: 7, name: 'Rohan Deshmukh', firstName: 'Rohan', college: 'Hindustan Institute of Technology',
-      rating: 3, date: '2026-05-08',
-      text: 'Nice hostel overall. Wi-Fi could be faster during peak hours but everything else is great.',
-      verified: true,
-    },
-    {
-      id: 8, name: 'Ishita Kulkarni', firstName: 'Ishita', college: 'St. Joseph College',
-      rating: 5, date: '2026-04-25',
-      text: 'Home away from home! The management is always available and resolves issues quickly.',
-      verified: true,
-    },
-  ]
-
-  // 6) Sample complaints for admin panel
+  // 5) Sample complaints for admin panel
   const complaints = [
     {
       id: 1, student: 'Manish Kumar', room: '301', type: 'Electrical',
@@ -230,7 +134,7 @@ export function buildDemoData() {
     },
   ]
 
-  return { rooms, students, bookings, payments, reviews, complaints }
+  return { rooms, students, bookings, payments, complaints }
 }
 
 function createBooking(student, room, idx, status) {
@@ -346,7 +250,7 @@ export const IMAGES = {
   facility: '/images/facilities.jpg',
   gallery: [
     { id: 1, category: 'Rooms', src: '/images/room.jpg', title: 'Deluxe Room' },
-    { id: 2, category: 'Rooms', src: '/images/room4.jpg', title: '4 Sharing Dorm' },
+    { id: 2, category: 'Rooms', src: '/images/room6.jpg', title: '6 Sharing Dorm' },
     { id: 3, category: 'Hostel', src: '/images/hostel.jpg', title: 'Hostel Building' },
     { id: 4, category: 'Hostel', src: '/images/hostel2.jpg', title: 'Front Entrance' },
     { id: 5, category: 'Dining', src: '/images/dining.jpg', title: 'Dining Hall' },

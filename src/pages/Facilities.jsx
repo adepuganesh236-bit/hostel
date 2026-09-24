@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Wifi,
   Camera,
@@ -11,9 +12,14 @@ import {
   BookOpen,
   Armchair,
   Brush,
-  CheckCircle2,
+  Building2,
+  Users,
+  ArrowRight,
 } from 'lucide-react'
 import SectionHeading from '../components/ui/SectionHeading'
+import { HOSTEL } from '../config'
+import { useData } from '../context/DataContext'
+import { inr } from '../lib/utils'
 import { Link } from 'react-router-dom'
 
 const FACILITIES = [
@@ -32,6 +38,17 @@ const FACILITIES = [
 ]
 
 export default function Facilities() {
+  const { rooms } = useData()
+  const [activeFloor, setActiveFloor] = useState(1)
+  const [activeSharing, setActiveSharing] = useState(0)
+
+  const floors = [1, 2, 3, 4]
+  const sharings = [4, 6, 10]
+  const floorRooms = rooms
+    .filter((r) => Number(r.floor) === activeFloor)
+    .filter((r) => (activeSharing ? Number(r.sharing) === activeSharing : true))
+    .slice(0, 5)
+
   return (
     <div>
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-950 py-16 text-white sm:py-20">
@@ -41,12 +58,22 @@ export default function Facilities() {
             Facilities
           </p>
           <h1 className="mt-4 max-w-2xl font-display text-3xl font-bold sm:text-5xl">
-            Premium Facilities. Zero Compromise.
+            Premium Facilities at {HOSTEL.name}
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-slate-200">
             Everything a student needs to study, rest and grow — available and
             maintained across the entire hostel.
           </p>
+        </div>
+      </section>
+
+      <section className="bg-slate-100 pt-24 pb-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="What's included"
+            title="Every Facility is Part of Your Stay"
+            subtitle="There are no hidden charges. All listed facilities are included in your monthly rent."
+          />
         </div>
       </section>
 
@@ -70,36 +97,110 @@ export default function Facilities() {
         </div>
       </section>
 
-      <section className="bg-slate-100 py-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="What's included"
-            title="Every Facility is Part of Your Stay"
-            subtitle="There are no hidden charges. All listed facilities are included in your monthly rent."
-          />
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-card">
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                'Wi-Fi in rooms & common areas',
-                'CCTV and 24/7 security personnel',
-                'Power backup (lights, fans, internet)',
-                'RO purified drinking water',
-                'Weekly housekeeping & linen service',
-                'Laundry machines & ironing',
-                'Hot water in all bathrooms',
-                'Study hall & common TV lounge',
-                'Covered bike / cycle parking',
-                'Mess with 3 healthy meals',
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5 text-sm font-medium text-slate-700">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* ========================= ROOMS BY FLOOR ========================= */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Rooms by floor"
+          title="Explore Rooms Floor by Floor"
+          subtitle="Pick a floor to see the five rooms on it — each with live bed availability."
+        />
 
-          <div className="mt-8 text-center">
+        {/* Sharing selector */}
+        <div className="mb-6 flex flex-wrap justify-center gap-3">
+          {sharings.map((share) => (
+            <button
+              key={share}
+              onClick={() => setActiveSharing((prev) => (prev === share ? 0 : share))}
+              className={
+                activeSharing === share
+                  ? 'inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-sm'
+                  : 'inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-600 transition hover:border-brand-300 hover:text-brand-700'
+              }
+            >
+              <Users className="h-4 w-4" /> {share} Sharing
+            </button>
+          ))}
+        </div>
+
+        {/* Floor selector */}
+        <div className="mb-10 flex flex-wrap justify-center gap-3">
+          {floors.map((floor) => (
+            <button
+              key={floor}
+              onClick={() => setActiveFloor(floor)}
+              className={
+                activeFloor === floor
+                  ? 'inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-sm'
+                  : 'inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-600 transition hover:border-brand-300 hover:text-brand-700'
+              }
+            >
+              <Building2 className="h-4 w-4" /> Floor {floor}
+            </button>
+          ))}
+        </div>
+
+        {/* Rooms on selected floor */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {floorRooms.length ? (
+            floorRooms.map((room, i) => (
+              <div
+                key={room.roomNumber}
+                className="anim-fade-up flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="relative overflow-hidden">
+                  <div className="relative h-40 bg-gradient-to-br from-brand-600 to-brand-800">
+                    {room.image ? (
+                      <img
+                        src={room.image}
+                        alt={`Room ${room.roomNumber}`}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    ) : null}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
+                  </div>
+                  <div className="absolute bottom-3 left-4 right-4">
+                    <p className="font-display text-2xl font-bold text-white">
+                      Room {room.roomNumber}
+                    </p>
+                    <p className="mt-1 flex items-center gap-1 text-xs text-slate-200">
+                      <Building2 className="h-3 w-3" /> Floor {room.floor}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col gap-4 p-5">
+                  <div className="flex items-end justify-between border-t border-slate-100 pt-4">
+                    <div>
+                      <p className="text-xs text-slate-400">Starting at</p>
+                      <p className="font-display text-xl font-bold text-slate-900">
+                        {inr(room.rent)}
+                        <span className="text-sm font-semibold text-slate-400">/month</span>
+                      </p>
+                    </div>
+                    <Link
+                      to={`/booking?room=${room.roomNumber}`}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
+                    >
+                      Book Now <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="py-16 text-center text-slate-500">
+              No rooms found on this floor.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="bg-slate-100 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
             <Link
               to="/booking"
               className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-8 py-3.5 text-sm font-bold text-white transition hover:bg-brand-700"

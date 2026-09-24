@@ -19,6 +19,9 @@ function mapProfile(row) {
     gender: row.gender,
     budget: row.budget,
     preferred_room: row.preferred_room,
+    motherName: row.mother_name,
+    fatherName: row.father_name,
+    parentPhone: row.parent_phone,
     role: row.role,
     verified: Boolean(row.verified),
     joiningDate: row.joining_date,
@@ -41,7 +44,7 @@ function bearerToken(req) {
 }
 
 router.post('/register', async (req, res, next) => {
-  const { email, password, fullName, mobile, college, course, year, gender, budget, preferredRoom } = req.body || {}
+  const { email, password, fullName, mobile, college, course, year, gender, budget, preferredRoom, motherName, fatherName, parentPhone } = req.body || {}
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
     return res.status(400).json({ error: 'A valid email is required.' })
   }
@@ -59,9 +62,9 @@ router.post('/register', async (req, res, next) => {
     const hash = await bcrypt.hash(String(password), 10)
     await conn.query(
       `INSERT INTO profiles
-         (id, full_name, mobile, email, password_hash, college, course, year, gender, budget, preferred_room, role, verified)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'student', 1)`,
-      [id, fullName, mobile, norm, hash, college, course, year, gender, budget, preferredRoom],
+         (id, full_name, mobile, email, password_hash, college, course, year, gender, budget, preferred_room, role, verified, mother_name, father_name, parent_phone)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'student', 1, ?, ?, ?)`,
+      [id, fullName, mobile, norm, hash, college, course, year, gender, budget, preferredRoom, motherName, fatherName, parentPhone],
     )
     res.status(201).json({ message: 'signup', user: { id, email: norm } })
   } catch (err) {

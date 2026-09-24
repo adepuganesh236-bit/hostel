@@ -102,7 +102,6 @@ export default function OwnerPayments() {
                     <th className="px-5 py-3">Student</th>
                     <th className="px-5 py-3">Room</th>
                     <th className="px-5 py-3">Amount</th>
-                    <th className="px-5 py-3">Method</th>
                     <th className="px-5 py-3">Transaction ID</th>
                     <th className="px-5 py-3">Date</th>
                     <th className="px-5 py-3">Status</th>
@@ -115,7 +114,6 @@ export default function OwnerPayments() {
                       <td className="px-5 py-3.5 font-bold text-slate-800">{p.studentName}</td>
                       <td className="px-5 py-3.5 font-mono font-semibold text-slate-600">{p.roomNumber} {p.bed}</td>
                       <td className="px-5 py-3.5 font-bold text-slate-800">{inr(p.amount)}</td>
-                      <td className="px-5 py-3.5 text-slate-600">{p.method || 'UPI'}</td>
                       <td className="px-5 py-3.5 font-mono text-xs text-slate-500">{p.transactionId}</td>
                       <td className="px-5 py-3.5 text-slate-500">{formatDate(p.date)}</td>
                       <td className="px-5 py-3.5"><Badge status={p.status} label={p.status === 'paid' ? 'Paid' : 'Pending'} /></td>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   BedDouble,
@@ -9,6 +10,7 @@ import {
   Wallet,
   AlertTriangle,
   Building2,
+  FileSpreadsheet,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -26,7 +28,9 @@ import {
   Area,
 } from 'recharts'
 import { useData } from '../../context/DataContext'
+import { useToast } from '../../context/ToastContext'
 import { inr } from '../../lib/utils'
+import { exportStudentsExcel } from '../../lib/exportStudents'
 import StatCard from '../../components/ui/StatCard'
 import { Card, CardHeader, CardBody } from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
@@ -66,6 +70,24 @@ function buildMonthlySeries(rooms, bookings, payments) {
 
 export default function OwnerDashboard() {
   const { rooms, students, bookings, payments, stats } = useData()
+  const toast = useToast()
+  const [exporting, setExporting] = useState(false)
+
+  const handleExport = async () => {
+    if (!students.length) {
+      toast.info('No registered students to export yet.')
+      return
+    }
+    setExporting(true)
+    try {
+      const fileName = await exportStudentsExcel(students)
+      toast.success(`Exported ${students.length} students to ${fileName}`)
+    } catch (err) {
+      toast.error(`Export failed: ${err.message}`)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   const occupancyPie = [
     { name: 'Occupied', value: stats.occupied },
@@ -80,7 +102,7 @@ export default function OwnerDashboard() {
 
   const occupancyPct = stats.totalBeds ? Math.round((stats.occupied / stats.totalBeds) * 100) : 0
 
-  const roomsByType = [1, 2, 3, 4].map((share) => {
+  const roomsByType = [6, 10].map((share) => {
     const list = rooms.filter((r) => r.sharing === share)
     const occupied = list.reduce(
       (s, r) => s + r.beds.filter((b) => b.status === 'occupied').length,
@@ -99,11 +121,21 @@ export default function OwnerDashboard() {
             Welcome back! Here's {HOSTEL.name} at a glance.
           </p>
         </div>
-        <Link to="/owner/rooms">
-          <button className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700">
-            <BedDouble className="h-4 w-4" /> Manage Rooms
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            {exporting ? 'Exporting…' : 'Export to Excel'}
           </button>
-        </Link>
+          <Link to="/owner/rooms">
+            <button className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700">
+              <BedDouble className="h-4 w-4" /> Manage Rooms
+            </button>
+          </Link>
+        </div>
       </div>
 
       {/* Top cards */}

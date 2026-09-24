@@ -199,7 +199,6 @@ export default function StudentDashboard() {
                 <thead>
                   <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
                     <th className="px-5 py-3">Payment ID</th>
-                    <th className="px-5 py-3">Method</th>
                     <th className="px-5 py-3">Date</th>
                     <th className="px-5 py-3">Amount</th>
                     <th className="px-5 py-3">Status</th>
@@ -209,7 +208,6 @@ export default function StudentDashboard() {
                   {payments.slice(0, 6).map((p) => (
                     <tr key={p.paymentId || p.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                       <td className="px-5 py-3 font-mono text-xs font-bold text-slate-700">{p.paymentId || p.id}</td>
-                      <td className="px-5 py-3 text-slate-600">{p.method || 'UPI'}</td>
                       <td className="px-5 py-3 text-slate-500">{formatDate(p.date)}</td>
                       <td className="px-5 py-3 font-bold text-slate-800">{inr(p.amount)}</td>
                       <td className="px-5 py-3"><Badge status={p.status} /></td>
@@ -229,7 +227,7 @@ export default function StudentDashboard() {
         <p className={cx('flex items-center gap-2 text-sm font-semibold text-emerald-800')}>
           <Sparkles className="h-4 w-4" /> {stats.available} beds are available right now across {stats.totalRooms} rooms.
         </p>
-        <Link to="/rooms#availability" className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-700">
+        <Link to="/booking" className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-700">
           Check Availability <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

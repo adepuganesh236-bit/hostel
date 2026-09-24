@@ -19,7 +19,7 @@ const TYPE_ICON = {
   Other: { icon: AlertTriangle, color: 'text-slate-600 bg-slate-100' },
 }
 
-export default function AdminComplaints() {
+export default function OwnerComplaints() {
   const { complaints, updateComplaintStatus } = useData()
   const toast = useToast()
   const [status, setStatus] = useState('all')

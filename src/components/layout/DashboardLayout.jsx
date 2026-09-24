@@ -6,7 +6,6 @@ import {
   Users,
   CalendarCheck,
   Wallet,
-  Star,
   MessageSquareWarning,
   LogOut,
   Building2,
@@ -14,6 +13,7 @@ import {
   X,
   ChevronRight,
   LifeBuoy,
+  Share2,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
@@ -32,23 +32,15 @@ const NAV_CONFIG = {
     { to: '/owner/students', label: 'Students', icon: Users },
     { to: '/owner/bookings', label: 'Bookings', icon: CalendarCheck },
     { to: '/owner/payments', label: 'Payments & Revenue', icon: Wallet },
-  ],
-  admin: [
-    { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
-    { to: '/admin/students', label: 'Students', icon: Users },
-    { to: '/admin/rooms', label: 'Rooms & Beds', icon: BedDouble },
-    { to: '/admin/bookings', label: 'Bookings', icon: CalendarCheck },
-    { to: '/admin/payments', label: 'Payments', icon: Wallet },
-    { to: '/admin/reviews', label: 'Reviews', icon: Star },
-    { to: '/admin/complaints', label: 'Complaints', icon: MessageSquareWarning },
+    { to: '/owner/complaints', label: 'Complaints', icon: MessageSquareWarning },
+    { to: '/owner/social', label: 'Social Media', icon: Share2 },
   ],
 }
 
-const ROLE_LABEL = { student: 'Student Panel', owner: 'Owner Panel', admin: 'Admin Panel' }
+const ROLE_LABEL = { student: 'Student Panel', owner: 'Owner Panel' }
 const ROLE_TINT = {
   student: 'from-brand-600 to-brand-800',
   owner: 'from-amber-500 to-orange-600',
-  admin: 'from-rose-500 to-rose-700',
 }
 
 export default function DashboardLayout({ scope }) {
@@ -73,7 +65,7 @@ export default function DashboardLayout({ scope }) {
           <Building2 className="h-5 w-5" />
         </span>
         <div className="flex flex-col">
-          <span className="font-display text-base font-bold text-white">StayNest</span>
+          <span className="font-display text-base font-bold text-white">{HOSTEL.name}</span>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             {ROLE_LABEL[scope]}
           </span>

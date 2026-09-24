@@ -5,8 +5,6 @@ import {
   Phone,
   Mail,
   Clock,
-  Globe,
-  Share2,
   AtSign,
   MessageCircle,
   ShieldCheck,
@@ -14,24 +12,37 @@ import {
   Heart,
 } from 'lucide-react'
 import { HOSTEL } from '../../config'
+import {
+  InstagramIcon,
+  FacebookIcon,
+  YoutubeIcon,
+} from '../social/SocialIcons'
+import { getSocialLinks } from '../../lib/socialSettings'
 
 const QUICK_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About Us' },
-  { to: '/rooms', label: 'Rooms & Tariff' },
   { to: '/facilities', label: 'Facilities' },
   { to: '/food', label: 'Food & Menu' },
+  { to: '/social', label: 'Social Media' },
 ]
 
 const STUDENT_LINKS = [
   { to: '/register', label: 'Create Account' },
   { to: '/login', label: 'Student Login' },
   { to: '/booking', label: 'Book a Room' },
-  { to: '/reviews', label: 'Reviews' },
   { to: '/contact', label: 'Contact Us' },
 ]
 
 export default function Footer() {
+  const social = getSocialLinks()
+  const SOCIAL_LINKS = [
+    { Icon: InstagramIcon, label: 'Instagram', href: social.instagram },
+    { Icon: FacebookIcon, label: 'Facebook', href: social.facebook },
+    { Icon: YoutubeIcon, label: 'YouTube', href: social.youtube },
+    { Icon: MessageCircle, label: 'WhatsApp', href: social.whatsapp },
+    { Icon: AtSign, label: 'Email', href: `mailto:${HOSTEL.email}` },
+  ]
   return (
     <footer className="mt-auto bg-slate-950 text-slate-300">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
@@ -43,24 +54,17 @@ export default function Footer() {
                 <Building2 className="h-5 w-5" />
               </span>
               <div>
-                <p className="font-display text-lg font-bold text-white">StayNest</p>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-400">
-                  Premium Hostel
-                </p>
+                <p className="font-display text-lg font-bold text-white">{HOSTEL.name}</p>
               </div>
             </div>
             <p className="mt-4 text-sm text-slate-400">{HOSTEL.tagline}</p>
             <div className="mt-5 flex gap-2">
-              {[
-                  { Icon: Globe, label: 'Website' },
-                  { Icon: MessageCircle, label: 'WhatsApp' },
-                  { Icon: AtSign, label: 'Email' },
-                  { Icon: Share2, label: 'Share' },
-                ].map(({ Icon, label }, i) => (
+              {SOCIAL_LINKS.map(({ Icon, label, href }) => (
                 <a
-                  key={i}
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-slate-300 transition hover:bg-brand-600 hover:text-white"
                   aria-label={label}
                 >

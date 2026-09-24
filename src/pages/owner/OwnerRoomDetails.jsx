@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
   BedDouble,
-  Snowflake,
   Users,
   IndianRupee,
   Phone,
@@ -73,7 +72,7 @@ export default function OwnerRoomDetails() {
             <div>
               <h1 className="font-display text-2xl font-bold text-slate-900">{room.typeLabel}</h1>
               <p className="flex items-center gap-1.5 text-sm text-slate-500">
-                <Snowflake className="h-3.5 w-3.5" /> {room.ac ? 'AC Room' : 'Non-AC Room'} · Floor {room.floor}
+                {room.typeLabel} · Floor {room.floor}
               </p>
             </div>
           </div>

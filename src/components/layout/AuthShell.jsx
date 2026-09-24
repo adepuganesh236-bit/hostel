@@ -15,7 +15,7 @@ export default function AuthShell({ title, subtitle, children, footer, demoHint 
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
               <Building2 className="h-6 w-6" />
             </span>
-            <span className="font-display text-xl font-bold">StayNest</span>
+            <span className="font-display text-xl font-bold">{HOSTEL.name}</span>
           </Link>
           <div>
             <h2 className="max-w-md font-display text-3xl font-bold leading-snug">
@@ -44,7 +44,7 @@ export default function AuthShell({ title, subtitle, children, footer, demoHint 
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white">
               <Building2 className="h-5 w-5" />
             </span>
-            <span className="font-display text-lg font-bold text-slate-900">StayNest</span>
+            <span className="font-display text-lg font-bold text-slate-900">{HOSTEL.name}</span>
           </Link>
         </div>
 

@@ -40,7 +40,6 @@ async function hashPassword(password) {
 // The demo student is the first student from the demo dataset.
 const DEMO_STUDENT = { id: 'STU-1000', role: 'student' }
 const DEMO_OWNER = { id: 'OWN-0001', role: 'owner' }
-const DEMO_ADMIN = { id: 'ADM-0001', role: 'admin' }
 
 function readDemoSession() {
   try {
@@ -157,6 +156,9 @@ export function AuthProvider({ children }) {
           gender: fields.gender,
           budget: fields.budget,
           preferredRoom: fields.preferredRoom,
+          motherName: fields.motherName,
+          fatherName: fields.fatherName,
+          parentPhone: fields.parentPhone,
         })
         return data
       }
@@ -175,6 +177,9 @@ export function AuthProvider({ children }) {
               gender: fields.gender,
               budget: fields.budget,
               preferred_room: fields.preferredRoom,
+              mother_name: fields.motherName,
+              father_name: fields.fatherName,
+              parent_phone: fields.parentPhone,
               role: 'student',
             },
             emailRedirectTo: `${window.location.origin}/login`,
@@ -217,6 +222,9 @@ export function AuthProvider({ children }) {
         gender: fields.gender,
         budget: fields.budget,
         preferredRoom: fields.preferredRoom,
+        motherName: fields.motherName,
+        fatherName: fields.fatherName,
+        parentPhone: fields.parentPhone,
         verified: false,
         demo: true,
       }
@@ -359,13 +367,12 @@ export function AuthProvider({ children }) {
     return { user: { id: DEMO_STUDENT.id }, profile: s }
   }, [])
 
-  const demoLogin = useCallback(async ({ role, mobile, email }) => {
+  const demoLogin = useCallback(async ({ role, mobile }) => {
     if (isApiConfigured) {
-      if (role === 'admin' || role === 'owner') {
-        const creds = role === 'owner' ? { mobile } : { email }
-        const { token, user } = await api.login(creds)
-        if (user.role !== role) {
-          throw new Error(`This account is not linked to the hostel ${role}.`)
+      if (role === 'owner') {
+        const { token, user } = await api.login({ mobile })
+        if (user.role !== 'owner') {
+          throw new Error('This mobile number is not linked to the hostel owner.')
         }
         setApiToken(token)
         setSession({ user: { id: user.id, role: user.role } })
@@ -384,18 +391,52 @@ export function AuthProvider({ children }) {
       setSession({ user: { id: DEMO_OWNER.id } })
       return { user: { id: DEMO_OWNER.id }, profile: s }
     }
-    if (role === 'admin') {
-      if (email && HOSTEL.adminEmail && email !== HOSTEL.adminEmail) {
-        throw new Error('This email is not linked to the hostel admin.')
-      }
-      const s = { ...DEMO_ADMIN, name: 'Hostel Admin', email, demo: true }
-      persistDemo(s)
-      setProfile({ ...s })
-      setSession({ user: { id: DEMO_ADMIN.id } })
-      return { user: { id: DEMO_ADMIN.id }, profile: s }
-    }
     return loginAsDemoStudent()
   }, [loginAsDemoStudent])
+
+  // -------------------------------------------------------------------------
+  const getCaptcha = useCallback(async () => {
+    if (isApiConfigured) {
+      return api.getCaptcha()
+    }
+    throw new Error('Password reset is only available when the backend API is running.')
+  }, [isApiConfigured])
+
+  const requestPasswordReset = useCallback(
+    async ({ identifier, captchaId, captchaAnswer }) => {
+      if (isApiConfigured) {
+        const res = await api.forgotPassword({
+          identifier: String(identifier || '').trim(),
+          captchaId: String(captchaId || ''),
+          captchaAnswer: String(captchaAnswer || '').trim(),
+        })
+        return { ok: true, resetToken: res.resetToken, role: res.role }
+      }
+      throw new Error('Password reset is only available when the backend API is running.')
+    },
+    [isApiConfigured],
+  )
+
+  const resetPassword = useCallback(async ({ resetToken, password, confirmPassword }) => {
+    if (isApiConfigured) {
+      const payload = {
+        resetToken: String(resetToken || '').trim(),
+        password: String(password || ''),
+        confirmPassword: String(confirmPassword || ''),
+      }
+      if (!payload.resetToken) {
+        throw new Error('This password reset link is invalid or has expired.')
+      }
+      if (payload.password.length < 6) {
+        throw new Error('Password must be at least 6 characters.')
+      }
+      if (payload.password !== payload.confirmPassword) {
+        throw new Error('Passwords do not match.')
+      }
+      return api.resetPassword(payload)
+    }
+    throw new Error('Password reset is only available when the backend API is running.')
+  }, [isApiConfigured])
 
   // -------------------------------------------------------------------------
   const logout = useCallback(async () => {
@@ -429,13 +470,17 @@ export function AuthProvider({ children }) {
       resendVerification,
       demoLogin,
       loginAsDemoStudent,
+      getCaptcha,
+      requestPasswordReset,
+      resetPassword,
       logout,
       updateProfile: (p) => setProfile(p),
     }),
     [
       session, profile, loading, signUp, signInWithEmail, sendEmailOtp,
       sendPhoneOtp, verifyOtp, resendVerification, demoLogin,
-      loginAsDemoStudent, logout, demoSession,
+      loginAsDemoStudent, getCaptcha, requestPasswordReset, resetPassword,
+      logout, demoSession,
     ],
   )
 

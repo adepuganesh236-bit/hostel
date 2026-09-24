@@ -4,7 +4,6 @@ import {
   Plus,
   Search,
   BedDouble,
-  Snowflake,
   Pencil,
   IndianRupee,
   Users,
@@ -18,10 +17,10 @@ import { Field, Input, Select } from '../../components/ui/Field'
 import EmptyState from '../../components/ui/EmptyState'
 import { cx } from '../../lib/utils'
 
-const SHARING_OPTIONS = ['1', '2', '3', '4']
+const SHARING_OPTIONS = ['6', '10']
 
 export default function OwnerRooms() {
-  const { rooms, addRoom, updateRoomRent } = useData()
+  const { rooms, addRoom, updateRoom } = useData()
   const toast = useToast()
 
   const [sharing, setSharing] = useState('all')
@@ -32,10 +31,10 @@ export default function OwnerRooms() {
   const [form, setForm] = useState({
     roomNumber: '',
     floor: '1',
-    sharing: '2',
-    ac: false,
+sharing: '6',
     rent: '',
     advance: '',
+    image: '',
   })
 
   const filtered = useMemo(() => {
@@ -48,7 +47,7 @@ export default function OwnerRooms() {
     return list
   }, [rooms, sharing, query])
 
-  const openEdit = (room) => setEdit({ roomNumber: room.roomNumber, rent: room.rent, advance: room.advance })
+  const openEdit = (room) => setEdit({ roomNumber: room.roomNumber, rent: room.rent, advance: room.advance, image: room.image })
 
   const saveRent = (e) => {
     e.preventDefault()
@@ -56,8 +55,11 @@ export default function OwnerRooms() {
       toast.warning('Enter a valid monthly rent.')
       return
     }
-    updateRoomRent(edit.roomNumber, edit.rent, edit.advance || 0)
-    toast.success(`Room ${edit.roomNumber} rent updated.`)
+    const existing = rooms.find((r) => r.roomNumber === edit.roomNumber)
+    if (existing) {
+      updateRoom({ ...existing, rent: Number(edit.rent), advance: Number(edit.advance) || Number(existing.advance), image: edit.image || existing.image })
+    }
+    toast.success(`Room ${edit.roomNumber} updated.`)
     setEdit(null)
   }
 
@@ -77,10 +79,10 @@ export default function OwnerRooms() {
       roomNumber: form.roomNumber,
       floor: Number(form.floor),
       sharing: share,
-      typeLabel: share === 1 ? 'Single Sharing' : share === 2 ? '2 Sharing' : share === 3 ? '3 Sharing' : '4 Sharing',
-      ac: Boolean(form.ac),
+      typeLabel: share === 6 ? '6 Sharing' : '10 Sharing',
       rent: Number(form.rent),
       advance: Number(form.advance) || Number(form.rent),
+      image: form.image,
       beds: Array.from({ length: share }, (_, i) => ({
         id: `${form.roomNumber}-b${i + 1}`,
         bedNumber: `Bed ${i + 1}`,
@@ -91,7 +93,7 @@ export default function OwnerRooms() {
     addRoom(room)
     toast.success(`Room ${form.roomNumber} added with ${share} beds.`)
     setNewRoom(false)
-    setForm({ roomNumber: '', floor: '1', sharing: '2', ac: false, rent: '', advance: '' })
+    setForm({ roomNumber: '', floor: '1', sharing: '6', rent: '', advance: '', image: '' })
   }
 
   return (
@@ -111,7 +113,7 @@ export default function OwnerRooms() {
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
-          {['all', '1', '2', '3', '4'].map((share) => (
+          {['all', '6', '10'].map((share) => (
             <button
               key={share}
               onClick={() => setSharing(share)}
@@ -155,7 +157,7 @@ export default function OwnerRooms() {
                     </p>
                     <p className="mt-0.5 text-sm text-slate-500">
                       <Users className="mr-1 inline h-3.5 w-3.5" />
-                      {room.typeLabel} · {room.ac ? <Snowflake className="inline h-3.5 w-3.5 text-sky-500" /> : null} {room.ac ? 'AC' : 'Non-AC'}
+                      {room.typeLabel}
                     </p>
                   </div>
                   <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
@@ -216,6 +218,9 @@ export default function OwnerRooms() {
           <Field label="Advance (₹)">
             <Input type="number" min={0} value={edit?.advance ?? ''} onChange={(e) => setEdit((m) => ({ ...m, advance: e.target.value }))} />
           </Field>
+          <Field label="Image URL">
+            <Input type="text" value={edit?.image ?? ''} onChange={(e) => setEdit((m) => ({ ...m, image: e.target.value }))} placeholder="https://…/room.jpg" />
+          </Field>
           <div className="flex justify-end gap-3">
             <Button type="button" variant="ghost" onClick={() => setEdit(null)}>Cancel</Button>
             <Button type="submit">Save Changes</Button>
@@ -238,15 +243,9 @@ export default function OwnerRooms() {
             <Select value={form.sharing} onChange={(e) => setForm((f) => ({ ...f, sharing: e.target.value }))}>
               {SHARING_OPTIONS.map((n) => (
                 <option key={n} value={n}>
-                  {n === '1' ? 'Single Sharing' : `${n} Sharing`}
+                  {`${n} Sharing`}
                 </option>
               ))}
-            </Select>
-          </Field>
-          <Field label="Room Type">
-            <Select value={form.ac ? 'ac' : 'nonac'} onChange={(e) => setForm((f) => ({ ...f, ac: e.target.value === 'ac' }))}>
-              <option value="nonac">Non-AC</option>
-              <option value="ac">AC</option>
             </Select>
           </Field>
           <Field label="Monthly Rent (₹)" required>
@@ -254,6 +253,9 @@ export default function OwnerRooms() {
           </Field>
           <Field label="Advance (₹)">
             <Input type="number" min={0} value={form.advance} onChange={(e) => setForm((f) => ({ ...f, advance: e.target.value }))} placeholder="e.g. 8000" />
+          </Field>
+          <Field label="Image URL">
+            <Input type="text" value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} placeholder="https://…/room.jpg" />
           </Field>
           <div className="flex justify-end gap-3 sm:col-span-2">
             <Button type="button" variant="ghost" onClick={() => setNewRoom(false)}>Cancel</Button>

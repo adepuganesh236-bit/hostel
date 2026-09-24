@@ -45,6 +45,8 @@ export const STATUS_STYLES = {
   in_progress: 'bg-sky-50 text-sky-700 ring-sky-200',
   resolved: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   rejected: 'bg-rose-50 text-rose-700 ring-rose-200',
+  active: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  checked_out: 'bg-slate-100 text-slate-600 ring-slate-200',
   refresh: 'bg-sky-50 text-sky-700 ring-sky-200',
 }
 
@@ -81,15 +83,14 @@ export function getInitials(name = '') {
 export const PAGE_TITLES = {
   '/': 'Home',
   '/about': 'About',
-  '/rooms': 'Rooms',
   '/facilities': 'Facilities',
   '/food': 'Food',
-  '/gallery': 'Gallery',
-  '/reviews': 'Reviews',
+  '/social': 'Social Media',
   '/contact': 'Contact',
   '/booking': 'Book a Room',
   '/login': 'Student Login',
   '/register': 'Create Account',
+  '/forgot-password': 'Forgot Password',
   '/verify': 'Verify Account',
   '/payment': 'Payment',
   '/payment-success': 'Payment Success',

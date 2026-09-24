@@ -8,7 +8,7 @@ import {
   useCallback,
 } from 'react'
 import { buildDemoData } from '../lib/demoData'
-import { fetchAllData, persistBooking, persistBed, persistPayment, persistReview, persistComplaint } from '../lib/database'
+import { fetchAllData, persistBooking, persistBed, persistPayment, persistComplaint, persistCheckout } from '../lib/database'
 import { isApiConfigured, api } from '../lib/api'
 import { uiActions } from './dataReducer'
 import { useToast } from './ToastContext'
@@ -78,12 +78,6 @@ export function DataProvider({ children }) {
           case 'ADD_PAYMENT':
             await persistPayment(action.payment)
             break
-          case 'ADD_REVIEW':
-            await persistReview(action.review)
-            break
-          case 'REMOVE_REVIEW':
-            await api.deleteReview(action.id)
-            break
           case 'ADD_COMPLAINT':
             await persistComplaint(action.complaint)
             break
@@ -144,7 +138,6 @@ export function DataProvider({ children }) {
       students: data.students,
       bookings: data.bookings,
       payments: data.payments,
-      reviews: data.reviews,
       complaints: data.complaints,
       stats: {
         totalRooms: data.rooms.length,
@@ -173,12 +166,17 @@ export function DataProvider({ children }) {
         mutate({ type: 'UPDATE_BOOKING_STATUS', bookingId, status }),
 
       addPayment: (payment) => mutate({ type: 'ADD_PAYMENT', payment }),
-      addReview: (review) => mutate({ type: 'ADD_REVIEW', review }),
-      removeReview: (id) => mutate({ type: 'REMOVE_REVIEW', id }),
       addComplaint: (complaint) => mutate({ type: 'ADD_COMPLAINT', complaint }),
       updateComplaintStatus: (id, status) =>
         mutate({ type: 'UPDATE_COMPLAINT_STATUS', id, status }),
       updateStudent: (student) => mutate({ type: 'UPDATE_STUDENT', student }),
+
+      // Backend is the source of truth for checkout: release the bed, record
+      // the date, then re-hydrate so rooms, beds and stats all re-sync.
+      checkoutStudent: async (id, date) => {
+        await persistCheckout(id, date)
+        await refresh()
+      },
     }
   }, [state, refresh, mutate])
 

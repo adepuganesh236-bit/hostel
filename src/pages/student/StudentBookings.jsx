@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { CalendarCheck, CalendarPlus } from 'lucide-react'
 import { useStudent } from './useStudent'
 import { inr, formatDate } from '../../lib/utils'
+import { HOSTEL } from '../../config'
 import Badge from '../../components/ui/Badge'
 import { Card, CardHeader, CardBody } from '../../components/ui/Card'
 import EmptyState from '../../components/ui/EmptyState'
@@ -48,7 +49,7 @@ export default function StudentBookings() {
                   {bookings.map((b, i) => (
                     <tr key={b.bookingId || i} className="border-b border-slate-50 transition hover:bg-slate-50/50">
                       <td className="px-5 py-3.5">
-                        <p className="font-bold text-slate-800">StayNest</p>
+                        <p className="font-bold text-slate-800">{HOSTEL.name}</p>
                         <p className="font-mono text-[11px] text-slate-400">{b.bookingId}</p>
                       </td>
                       <td className="px-5 py-3.5 font-semibold text-slate-700">Room {b.roomNumber}</td>

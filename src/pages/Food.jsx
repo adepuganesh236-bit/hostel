@@ -1,33 +1,31 @@
 import { useState } from 'react'
 import {
-  Sun,
-  CloudSun,
-  Moon,
-  Clock,
   Utensils,
   MessageSquareText,
   Info,
   CheckCircle2,
+  Clock,
 } from 'lucide-react'
 import { WEEKLY_MENU, DAILY_TIMINGS, FOOD_RULES, getTodayDay } from '../lib/foodData'
+import { HOSTEL } from '../config'
 import SectionHeading from '../components/ui/SectionHeading'
 import Button from '../components/ui/Button'
 import { useToast } from '../context/ToastContext'
 
-const MEALS = [
-  { key: 'Breakfast', icon: Sun, time: DAILY_TIMINGS.Breakfast, color: 'bg-amber-500' },
-  { key: 'Lunch', icon: CloudSun, time: DAILY_TIMINGS.Lunch, color: 'bg-brand-600' },
-  { key: 'Dinner', icon: Moon, time: DAILY_TIMINGS.Dinner, color: 'bg-slate-800' },
-]
-
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+const dayItems = (day) => [
+  ...(WEEKLY_MENU.Breakfast[day] || []),
+  ...(WEEKLY_MENU.Lunch[day] || []),
+  ...(WEEKLY_MENU.Dinner[day] || []),
+]
 
 export default function Food() {
   const toast = useToast()
   const today = getTodayDay()
   const [feedback, setFeedback] = useState({ rating: 5, message: '' })
 
-  const todayMenu = (meal) => WEEKLY_MENU[meal][today] || []
+  const todayMenu = dayItems(today)
 
   return (
     <div>
@@ -41,8 +39,8 @@ export default function Food() {
             Three Healthy Meals. Every Single Day.
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-white/90">
-            Home-style, hygienically prepared food for all residents — with a
-            rotating weekly menu that never gets boring.
+            Home-style, hygienically prepared food for all residents at {HOSTEL.name}
+            — with a rotating weekly menu that never gets boring.
           </p>
         </div>
       </section>
@@ -52,33 +50,51 @@ export default function Food() {
         <SectionHeading
           eyebrow={`Today · ${today}`}
           title="Today's Menu"
-          subtitle="The mess serves three meals a day, fresh and on time."
+          subtitle="Everything being served today, all in one place."
         />
-        <div className="grid gap-6 md:grid-cols-3">
-          {MEALS.map((meal, i) => (
-            <div
-              key={meal.key}
-              className="anim-fade-up overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition hover:-translate-y-1 hover:shadow-soft"
-              style={{ animationDelay: `${i * 70}ms` }}
-            >
-              <div className={`flex items-center justify-between px-5 py-4 text-white ${meal.color}`}>
-                <span className="flex items-center gap-2.5 font-display text-lg font-bold">
-                  <meal.icon className="h-5 w-5" /> {meal.key}
-                </span>
-                <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-bold">
-                  <Clock className="h-3.5 w-3.5" /> {meal.time}
-                </span>
+        <div className="anim-fade-up rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="flex items-center gap-2 font-display text-xl font-bold text-slate-900">
+              <Utensils className="h-5 w-5 text-brand-600" /> Today's Menu
+            </h3>
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+              {today}
+            </span>
+          </div>
+          <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+            {todayMenu.map((item) => (
+              <li key={item} className="flex items-center gap-2.5 rounded-lg bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-700">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Food timings */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="Serving Hours"
+            title="Food Timings"
+            subtitle="Meals are served fresh and on time, every day."
+          />
+          <div className="grid gap-6 md:grid-cols-3">
+            {Object.entries(DAILY_TIMINGS).map(([meal, time], i) => (
+              <div
+                key={meal}
+                className="anim-fade-up rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card"
+                style={{ animationDelay: `${i * 70}ms` }}
+              >
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600/10">
+                  <Clock className="h-6 w-6 text-brand-600" />
+                </div>
+                <p className="mt-4 font-display text-lg font-bold text-slate-900">{meal}</p>
+                <p className="mt-1 text-sm font-medium text-slate-500">{time}</p>
               </div>
-              <ul className="space-y-2.5 px-5 py-5">
-                {todayMenu(meal.key).map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm font-medium text-slate-700">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -91,23 +107,21 @@ export default function Food() {
               <table className="min-w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-5 py-3.5 font-display text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <th className="w-40 px-5 py-3.5 font-display text-xs font-bold uppercase tracking-wider text-slate-500">
                       Day
                     </th>
-                    {MEALS.map((m) => (
-                      <th key={m.key} className="px-5 py-3.5 font-display text-xs font-bold uppercase tracking-wider text-slate-500">
-                        {m.key}
-                      </th>
-                    ))}
+                    <th className="px-5 py-3.5 font-display text-xs font-bold uppercase tracking-wider text-slate-500">
+                      Menu
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {DAYS.map((day, _i) => (
+                  {DAYS.map((day) => (
                     <tr
                       key={day}
                       className={`border-b border-slate-100 transition hover:bg-brand-50/40 ${day === today ? 'bg-brand-50/60' : ''}`}
                     >
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-4 align-top">
                         <span className="font-bold text-slate-800">
                           {day}
                           {day === today ? (
@@ -117,11 +131,9 @@ export default function Food() {
                           ) : null}
                         </span>
                       </td>
-                      {MEALS.map((m) => (
-                        <td key={m.key} className="px-5 py-4 text-slate-600">
-                          {(WEEKLY_MENU[m.key][day] || []).slice(0, 3).join(' · ')}
-                        </td>
-                      ))}
+                      <td className="px-5 py-4 text-slate-600">
+                        {dayItems(day).join(' · ')}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -147,16 +159,6 @@ export default function Food() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-3">
-              {MEALS.map((m) => (
-                <div key={m.key} className="text-center">
-                  <p className="flex items-center justify-center gap-1.5 text-sm font-bold text-slate-700">
-                    <m.icon className="h-4 w-4 text-brand-600" /> {m.key}
-                  </p>
-                  <p className="mt-0.5 text-xs text-slate-500">{m.time}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Feedback */}

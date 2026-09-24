@@ -24,7 +24,6 @@ function mapRoom(row) {
     floor: row.floor,
     sharing: row.sharing,
     typeLabel: row.type_label,
-    ac: bool(row.ac),
     rent: num(row.rent),
     advance: num(row.advance),
     beds: [],
@@ -49,6 +48,11 @@ function mapStudent(row) {
     joiningDate: row.joining_date,
     paymentStatus: row.payment_status,
     budget: num(row.budget),
+    motherName: row.mother_name,
+    fatherName: row.father_name,
+    parentPhone: row.parent_phone,
+    preferredRoom: row.preferred_room,
+    checkoutDate: row.checkout_date,
     verified: bool(row.verified),
   }
 }
@@ -97,20 +101,6 @@ function mapPayment(row) {
   }
 }
 
-function mapReview(row) {
-  return {
-    id: row.id,
-    studentId: row.student_id,
-    name: row.student_name,
-    firstName: (row.student_name || '').split(' ')[0],
-    college: row.college,
-    rating: row.rating,
-    text: row.review_text,
-    date: String(row.date || ''),
-    verified: bool(row.verified),
-  }
-}
-
 function mapComplaint(row) {
   return {
     id: row.id,
@@ -124,7 +114,7 @@ function mapComplaint(row) {
   }
 }
 
-function compose(hostelRow, roomRows, bedRows, studentRows, bookingRows, paymentRows, reviewRows, complaintRows) {
+function compose(hostelRow, roomRows, bedRows, studentRows, bookingRows, paymentRows, complaintRows) {
   const rooms = roomRows.map(mapRoom).map((room) => {
     room.beds = bedRows
       .filter((b) => b.room_id === room.roomNumber)
@@ -138,7 +128,6 @@ function compose(hostelRow, roomRows, bedRows, studentRows, bookingRows, payment
     students: studentRows.map(mapStudent),
     bookings: bookingRows.map(mapBooking),
     payments: paymentRows.map(mapPayment),
-    reviews: reviewRows.map(mapReview),
     complaints: complaintRows.map(mapComplaint),
     pricing: null,
   }
@@ -146,7 +135,7 @@ function compose(hostelRow, roomRows, bedRows, studentRows, bookingRows, payment
 
 router.get('/overview', async (_req, res, next) => {
   try {
-    const [[hostelRows], [roomRows], [bedRows], [studentRows], [bookingRows], [paymentRows], [reviewRows], [complaintRows]] =
+    const [[hostelRows], [roomRows], [bedRows], [studentRows], [bookingRows], [paymentRows], [complaintRows]] =
       await Promise.all([
         pool.query('SELECT * FROM hostel ORDER BY id LIMIT 1'),
         pool.query('SELECT * FROM rooms ORDER BY room_number'),
@@ -154,10 +143,9 @@ router.get('/overview', async (_req, res, next) => {
         pool.query(`SELECT * FROM profiles WHERE role = 'student' ORDER BY id`),
         pool.query('SELECT * FROM bookings ORDER BY date'),
         pool.query('SELECT * FROM payments ORDER BY date'),
-        pool.query('SELECT * FROM reviews ORDER BY date DESC'),
         pool.query('SELECT * FROM complaints ORDER BY date DESC'),
       ])
-    res.json(compose(hostelRows[0], roomRows, bedRows, studentRows, bookingRows, paymentRows, reviewRows, complaintRows))
+    res.json(compose(hostelRows[0], roomRows, bedRows, studentRows, bookingRows, paymentRows, complaintRows))
   } catch (err) {
     next(err)
   }
@@ -180,13 +168,13 @@ router.get('/rooms', async (_req, res, next) => {
 })
 
 router.post('/rooms', async (req, res, next) => {
-  const { roomNumber, floor, sharing, typeLabel, ac, rent, advance } = req.body || {}
+  const { roomNumber, floor, sharing, typeLabel, rent, advance } = req.body || {}
   if (!roomNumber) return res.status(400).json({ error: 'roomNumber is required.' })
   try {
     await pool.query(
-      `INSERT INTO rooms (id, room_number, floor, sharing, type_label, ac, rent, advance)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [roomNumber, roomNumber, floor, sharing, typeLabel, ac ? 1 : 0, rent, advance],
+      `INSERT INTO rooms (id, room_number, floor, sharing, type_label, rent, advance)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [roomNumber, roomNumber, floor, sharing, typeLabel, rent, advance],
     )
     res.status(201).json({ ok: true })
   } catch (err) {
@@ -196,11 +184,11 @@ router.post('/rooms', async (req, res, next) => {
 })
 
 router.patch('/rooms/:roomNumber', async (req, res, next) => {
-  const { rent, advance, ac } = req.body || {}
+  const { rent, advance } = req.body || {}
   try {
     const result = await pool.query(
-      'UPDATE rooms SET rent = ?, advance = ?, ac = ? WHERE room_number = ?',
-      [num(rent), num(advance), ac ? 1 : 0, req.params.roomNumber],
+      'UPDATE rooms SET rent = ?, advance = ? WHERE room_number = ?',
+      [num(rent), num(advance), req.params.roomNumber],
     )
     if (!result[0].affectedRows) return res.status(404).json({ error: 'Room not found.' })
     res.json({ ok: true })
@@ -226,9 +214,11 @@ router.patch('/beds/:id', async (req, res, next) => {
     if (!bedRows.length) return res.status(404).json({ error: 'Bed not found.' })
     const current = bedRows[0]
     const nextStatus = status || current.status
+    // A bed released back to "available" can never hold a student.
+    const nextStudentId = nextStatus === 'available' ? null : studentId ?? current.student_id
     await pool.query(
       `UPDATE beds SET status = ?, student_id = ? WHERE id = ?`,
-      [nextStatus, studentId ?? current.student_id, req.params.id],
+      [nextStatus, nextStudentId, req.params.id],
     )
     if (studentId && nextStatus === 'occupied') {
       await pool.query(
@@ -315,30 +305,6 @@ router.post('/payments', async (req, res, next) => {
   }
 })
 
-router.post('/reviews', async (req, res, next) => {
-  const r = req.body || {}
-  try {
-    const result = await pool.query(
-      `INSERT INTO reviews (student_id, student_name, college, rating, review_text, date, verified)
-       VALUES (?, ?, ?, ?, ?, ?, 1)`,
-      [r.studentId || null, r.name || r.studentName, r.college, r.rating, r.text, r.date || new Date().toISOString().slice(0, 10)],
-    )
-    res.status(201).json({ ok: true, id: result[0].insertId })
-  } catch (err) {
-    next(err)
-  }
-})
-
-router.delete('/reviews/:id', async (req, res, next) => {
-  try {
-    const result = await pool.query('DELETE FROM reviews WHERE id = ?', [req.params.id])
-    if (!result[0].affectedRows) return res.status(404).json({ error: 'Review not found.' })
-    res.json({ ok: true })
-  } catch (err) {
-    next(err)
-  }
-})
-
 router.post('/complaints', async (req, res, next) => {
   const c = req.body || {}
   try {
@@ -362,6 +328,37 @@ router.patch('/complaints/:id/status', async (req, res, next) => {
     res.json({ ok: true })
   } catch (err) {
     next(err)
+  }
+})
+
+router.post('/students/:id/checkout', async (req, res, next) => {
+  const body = req.body || {}
+  const date = String(body.date || new Date().toISOString().slice(0, 10))
+  const conn = await pool.getConnection()
+  try {
+    const [rows] = await conn.query('SELECT * FROM profiles WHERE id = ?', [req.params.id])
+    if (!rows.length) return res.status(404).json({ error: 'Student not found.' })
+    const profile = rows[0]
+    if (profile.role !== 'student') return res.status(400).json({ error: 'Only student profiles can check out.' })
+
+    // Release the student's bed (mark available, clear owner) WITHOUT deleting the bed row.
+    const [bedRows] = await conn.query(
+      'SELECT id FROM beds WHERE (id = ? OR student_id = ?) ORDER BY id LIMIT 1',
+      [profile.bed_id, profile.id],
+    )
+    const releasedBedId = bedRows[0]?.id || null
+    if (releasedBedId) {
+      await conn.query(`UPDATE beds SET status = 'available', student_id = NULL WHERE id = ?`, [releasedBedId])
+    }
+
+    // Record the checkout date. The live bed link is cleared so the next
+    // student can take over the bed cleanly; room/bed numbers stay for history.
+    await conn.query(`UPDATE profiles SET checkout_date = ?, bed_id = NULL WHERE id = ?`, [date, profile.id])
+    res.json({ ok: true, checkoutDate: date, bedId: releasedBedId })
+  } catch (err) {
+    next(err)
+  } finally {
+    conn.release()
   }
 })
 

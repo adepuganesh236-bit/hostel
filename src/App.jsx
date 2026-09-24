@@ -5,23 +5,19 @@ import { DataProvider } from './context/DataContext'
 import RequireAuth, { RequireRole } from './components/guard/RouteGuards'
 import PublicLayout from './components/layout/PublicLayout'
 import DashboardLayout from './components/layout/DashboardLayout'
-import AuthShell from './components/layout/AuthShell'
-
 import Home from './pages/Home'
 import About from './pages/About'
-import Rooms from './pages/Rooms'
 import Facilities from './pages/Facilities'
 import Food from './pages/Food'
-import Gallery from './pages/Gallery'
-import Reviews from './pages/Reviews'
+import Social from './pages/Social'
 import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
 
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Verify from './pages/auth/Verify'
+import ForgotPassword from './pages/auth/ForgotPassword'
 import OwnerLogin from './pages/owner/OwnerLogin'
-import AdminLogin from './pages/admin/AdminLogin'
 
 import Booking from './pages/booking/Booking'
 import Payment from './pages/booking/Payment'
@@ -37,14 +33,8 @@ import OwnerRoomDetails from './pages/owner/OwnerRoomDetails'
 import OwnerStudents from './pages/owner/OwnerStudents'
 import OwnerBookings from './pages/owner/OwnerBookings'
 import OwnerPayments from './pages/owner/OwnerPayments'
-
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminStudents from './pages/admin/AdminStudents'
-import AdminRooms from './pages/admin/AdminRooms'
-import AdminBookings from './pages/admin/AdminBookings'
-import AdminPayments from './pages/admin/AdminPayments'
-import AdminReviews from './pages/admin/AdminReviews'
-import AdminComplaints from './pages/admin/AdminComplaints'
+import OwnerSocial from './pages/owner/OwnerSocial'
+import OwnerComplaints from './pages/owner/OwnerComplaints'
 
 export default function App() {
   return (
@@ -57,22 +47,18 @@ export default function App() {
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/rooms" element={<Rooms />} />
                 <Route path="/facilities" element={<Facilities />} />
                 <Route path="/food" element={<Food />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/reviews" element={<Reviews />} />
+                <Route path="/social" element={<Social />} />
                 <Route path="/contact" element={<Contact />} />
               </Route>
 
               {/* Auth */}
-              <Route element={<AuthShell />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/verify" element={<Verify />} />
-                <Route path="/owner/login" element={<OwnerLogin />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-              </Route>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/verify" element={<Verify />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/owner/login" element={<OwnerLogin />} />
 
               {/* Booking flow (auth required) */}
               <Route
@@ -129,24 +115,8 @@ export default function App() {
                 <Route path="students" element={<OwnerStudents />} />
                 <Route path="bookings" element={<OwnerBookings />} />
                 <Route path="payments" element={<OwnerPayments />} />
-              </Route>
-
-              {/* Admin panel */}
-              <Route
-                path="/admin"
-                element={
-                  <RequireRole role="admin">
-                    <DashboardLayout scope="admin" />
-                  </RequireRole>
-                }
-              >
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="students" element={<AdminStudents />} />
-                <Route path="rooms" element={<AdminRooms />} />
-                <Route path="bookings" element={<AdminBookings />} />
-                <Route path="payments" element={<AdminPayments />} />
-                <Route path="reviews" element={<AdminReviews />} />
-                <Route path="complaints" element={<AdminComplaints />} />
+                <Route path="complaints" element={<OwnerComplaints />} />
+                <Route path="social" element={<OwnerSocial />} />
               </Route>
 
               {/* 404 */}

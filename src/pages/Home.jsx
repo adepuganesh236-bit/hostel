@@ -13,7 +13,6 @@ import {
   Utensils,
   Users,
   Building2,
-  Quote,
 } from 'lucide-react'
 import { HOSTEL, PRICING, AVAILABLE_BEDS } from '../config'
 import { useData } from '../context/DataContext'
@@ -23,12 +22,10 @@ import Badge from '../components/ui/Badge'
 import { heroImageUrl } from '../lib/storage'
 
 export default function Home() {
-  const { rooms, stats } = useData()
-  const featuredRooms = rooms.slice(0, 3)
-
+  const { stats } = useData()
   const quickInfo = [
-    { icon: IndianRupee, label: 'Starting From', value: `${inr(PRICING.rooms.double.rent)}/month`, sub: '2 Sharing Non-AC', accent: 'bg-brand-600' },
-    { icon: BedDouble, label: 'Available Beds', value: String(AVAILABLE_BEDS), sub: stats?.available ? `${stats.available} live right now` : 'across 40 rooms', accent: 'bg-emerald-500' },
+    { icon: IndianRupee, label: 'Starting From', value: `${inr(PRICING.rooms.ten.rent)}/month`, sub: '10 Sharing · All-inclusive', accent: 'bg-brand-600' },
+    { icon: BedDouble, label: 'Available Beds', value: String(AVAILABLE_BEDS), sub: stats?.available ? `${stats.available} live right now` : 'across 20 rooms', accent: 'bg-emerald-500' },
     { icon: ShieldCheck, label: 'Security', value: '24/7 CCTV', sub: 'Round the clock monitoring', accent: 'bg-slate-800' },
     { icon: CookingPot, label: 'Food', value: '3 Meals Daily', sub: 'Breakfast · Lunch · Dinner', accent: 'bg-amber-500' },
   ]
@@ -41,16 +38,10 @@ export default function Home() {
   ]
 
   const steps = [
-    { n: '01', title: 'Choose Your Room', text: 'Browse single to 4 sharing rooms with live bed availability.' },
+    { n: '01', title: 'Choose Your Room', text: 'Browse 4 to 10 sharing rooms with live bed availability.' },
     { n: '02', title: 'Book Your Bed', text: 'Pick an available bed and complete the booking form.' },
     { n: '03', title: 'Pay Securely', text: 'Pay via UPI, cards or net banking through a secure checkout.' },
     { n: '04', title: 'Move In', text: 'Get a confirmed room and enjoy a home away from home.' },
-  ]
-
-  const testimonials = [
-    { name: 'Rahul S.', role: 'IIT Madras', text: 'Very clean rooms and good facilities. Truly feels like home.' },
-    { name: 'Sneha R.', role: 'Anna University', text: 'Safe, secure and the food is amazing. My parents are relieved!' },
-    { name: 'Arjun N.', role: 'VIT Chennai', text: 'Great study area, high-speed Wi-Fi and friendly wardens.' },
   ]
 
   return (
@@ -60,7 +51,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <img
             src={heroImageUrl()}
-            alt="StayNest Premium Hostel"
+            alt="Hostel"
             className="h-full w-full object-cover"
             onError={(e) => {
               e.currentTarget.onerror = null
@@ -82,10 +73,7 @@ export default function Home() {
               className="anim-fade-up mt-6 text-balance font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl"
               style={{ animationDelay: '80ms' }}
             >
-              Find Your Perfect Room.
-              <span className="block bg-gradient-to-r from-brand-300 via-amber-300 to-pink-300 bg-clip-text text-transparent">
-                Feel At Home.
-              </span>
+              {HOSTEL.name}
             </h1>
             <p
               className="anim-fade-up mt-6 max-w-xl text-lg leading-relaxed text-slate-200"
@@ -103,12 +91,6 @@ export default function Home() {
                 className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-7 py-3.5 text-base font-bold text-white shadow-lift transition hover:bg-amber-600"
               >
                 Book Your Room <ArrowRight className="h-5 w-5" />
-              </Link>
-              <Link
-                to="/rooms"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-7 py-3.5 text-base font-bold text-white backdrop-blur transition hover:bg-white/20"
-              >
-                Explore Rooms
               </Link>
             </div>
 
@@ -159,7 +141,7 @@ export default function Home() {
             <div className="overflow-hidden rounded-3xl shadow-soft">
               <img
                 src="/images/about.jpg"
-                alt="About StayNest"
+                alt={`About ${HOSTEL.name}`}
                 className="h-96 w-full object-cover transition-transform duration-700 hover:scale-105 sm:h-[420px]"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none'
@@ -205,30 +187,6 @@ export default function Home() {
                 Learn More About Us <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================= ROOMS ============================= */}
-      <section className="bg-slate-100 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="Rooms & Tariff"
-            title="Rooms Built for Every Budget"
-            subtitle="Choose from Single, 2, 3 or 4 sharing rooms — each with comfortable beds, study desks, storage and modern washrooms."
-          />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredRooms.map((room, i) => (
-              <RoomPreview key={room.roomNumber} room={room} index={i} />
-            ))}
-          </div>
-          <div className="mt-10 text-center">
-            <Link
-              to="/rooms"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800"
-            >
-              View All Rooms & Live Availability <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
         </div>
       </section>
@@ -303,41 +261,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============================= TESTIMONIALS ============================= */}
-      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-        <SectionHeading
-          eyebrow="Student love"
-          title="What Our Residents Say"
-          subtitle="Real reviews from verified students currently staying with us."
-        />
-        <div className="grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <div
-              key={t.name}
-              className="anim-fade-up relative rounded-2xl border border-slate-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-soft"
-              style={{ animationDelay: `${i * 80}ms` }}
-            >
-              <Quote className="h-8 w-8 text-brand-100" />
-              <div className="mt-2 flex gap-0.5">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <Star key={n} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700">“{t.text}”</p>
-              <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-4">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">
-                  {t.name.split(' ').map((w) => w[0]).join('')}
-                </span>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">{t.name}</p>
-                  <p className="text-xs text-slate-500">{t.role}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ============================= CTA ============================= */}
       <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-700 to-brand-900 px-8 py-14 text-center shadow-lift sm:px-16">
@@ -366,48 +289,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
-  )
-}
-
-function RoomPreview({ room, index }) {
-  const available = room.beds.filter((b) => b.status === 'available').length
-  return (
-    <div
-      className="anim-fade-up group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
-      style={{ animationDelay: `${index * 70}ms` }}
-    >
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
-        <img
-          src="/images/room.jpg"
-          alt={room.typeLabel}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => { e.currentTarget.style.display = 'none' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
-        <div className="absolute bottom-4 left-4">
-          <p className="font-display text-lg font-bold text-white">{room.typeLabel}</p>
-          <p className="text-xs text-slate-200">Room {room.roomNumber} · {room.ac ? 'AC' : 'Non-AC'}</p>
-        </div>
-        <span className="absolute right-4 top-4 rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow">
-          {available} available
-        </span>
-      </div>
-      <div className="flex items-center justify-between p-5">
-        <div>
-          <p className="text-xs text-slate-400">Starting at</p>
-          <p className="font-display text-2xl font-bold text-slate-900">
-            {inr(room.rent)}
-            <span className="text-sm font-semibold text-slate-400">/month</span>
-          </p>
-        </div>
-        <Link
-          to={`/rooms?room=${room.roomNumber}`}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
-        >
-          View <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
     </div>
   )
 }

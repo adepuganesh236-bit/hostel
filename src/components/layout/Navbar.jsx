@@ -3,11 +3,9 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   Home as HomeIcon,
   Info,
-  BedDouble,
   CookingPot,
-  Image as ImageIcon,
-  Star,
   Phone,
+  Share2,
   LogIn,
   UserPlus,
   CalendarCheck,
@@ -26,11 +24,9 @@ import { cx } from '../../lib/utils'
 const MENU = [
   { to: '/', label: 'Home', icon: HomeIcon },
   { to: '/about', label: 'About', icon: Info },
-  { to: '/rooms', label: 'Rooms', icon: BedDouble },
   { to: '/facilities', label: 'Facilities', icon: Building2 },
   { to: '/food', label: 'Food', icon: CookingPot },
-  { to: '/gallery', label: 'Gallery', icon: ImageIcon },
-  { to: '/reviews', label: 'Reviews', icon: Star },
+  { to: '/social', label: 'Social', icon: Share2 },
   { to: '/contact', label: 'Contact', icon: Phone },
 ]
 
@@ -46,11 +42,9 @@ export default function Navbar() {
   const dashboardPath =
     role === 'student'
       ? '/student/dashboard'
-      : role === 'owner'
+      : role === 'owner' || role === 'admin'
         ? '/owner/dashboard'
-        : role === 'admin'
-          ? '/admin/dashboard'
-          : null
+        : null
 
   const handleLogout = async () => {
     await logout()
@@ -76,10 +70,7 @@ export default function Navbar() {
           </span>
           <span className="hidden flex-col sm:flex">
             <span className="font-display text-lg font-bold leading-tight text-slate-900">
-              StayNest
-            </span>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-brand-600">
-              Premium Hostel
+              {HOSTEL.name}
             </span>
           </span>
         </Link>
